@@ -76,6 +76,12 @@ class BasePage(ctk.CTkFrame):
         reserve_btn = make_nav_item("Reserveren", "ReservationPage")
         reserve_btn.pack(side="left", padx=12)
 
+        divS = ctk.CTkFrame(nav_container, width=2, height=20, fg_color="#444444")
+        divS.pack(side="left", padx=12)
+
+        damage_btn = make_nav_item("Schade melden", "DamagePage")
+        damage_btn.pack(side="left", padx=12)
+
         div2 = ctk.CTkFrame(nav_container, width=2, height=20, fg_color="#444444")
         div2.pack(side="left", padx=12)
 

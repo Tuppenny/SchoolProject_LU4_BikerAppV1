@@ -61,9 +61,11 @@ class StaffLoginPage(BasePage):
         username = self.username_entry.get().strip()
         password = self.password_entry.get().strip()
 
-        # Later vervangen door database-check
-        if username == "admin" and password == "biker123":
-            messagebox.showinfo("Succes", "U bent succesvol ingelogd als medewerker.")
-            # TODO: hier doorverwijzen naar medewerkersdashboard
+        user = self.app.db.login_employee(username, password)
+
+        if user:
+            messagebox.showinfo("Succes", f"Ingelogd als {user['role']}")
+            self.app.logged_in_user = user  # ← handig voor later
+            self.app.show_page("ManagerPortalPage")  # voorlopig altijd manager
         else:
             messagebox.showerror("Fout", "Onjuiste gebruikersnaam of wachtwoord.")
