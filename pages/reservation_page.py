@@ -177,7 +177,7 @@ class ReservationPage(BasePage):
             messagebox.showerror("Fout", "Vul alle verplichte velden in.")
             return
 
-        # DATUM VALIDATIE
+        # Datum validatie
         start_date = self.validate_date(start)
         end_date = self.validate_date(end)
 
@@ -195,34 +195,24 @@ class ReservationPage(BasePage):
 
         bike = self.bike_type_var.get()
 
-        accessories = []
+        # ACCESSOIRES
+        accs = []
         if self.access_childseat_var.get():
-            accessories.append("Kinderzitje")
+            accs.append("Kinderzitje")
         if self.access_helmet_var.get():
-            accessories.append("Helm")
+            accs.append("Helm")
 
-        accessories_str = ", ".join(accessories) if accessories else "Geen"
+        accs_text = ", ".join(accs) if accs else "Geen"
 
-        # Opslaan in database
+        # OPSLAAN
         self.app.db.save_reservation(
             name=name,
             email=email,
-            start=start,
-            end=end,
+            start_date=start,
+            end_date=end,
             bike_type=bike,
-            accessories=accessories_str,
+            accessories=accs_text,
             comment=self.comment_entry.get("1.0", "end").strip()
         )
 
         messagebox.showinfo("Succes", "Reservering succesvol opgeslagen!")
-
-        # Formulier resetten
-        self.name_entry.delete(0, "end")
-        self.email_entry.delete(0, "end")
-        self.start_entry.delete(0, "end")
-        self.end_entry.delete(0, "end")
-        self.comment_entry.delete("1.0", "end")
-        self.bike_type_var.set("Herenfiets")
-        self.access_childseat_var.set(False)
-        self.access_helmet_var.set(False)
-        self.update_bike_info()

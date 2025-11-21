@@ -25,7 +25,7 @@ class BikerApp(ctk.CTk):
 
         # ==== VENSTERINSTELLINGEN ====
         self.title("Biker Haaglanden")
-        self.geometry("1000x650")
+        self.geometry("1500x1000")
         ctk.set_appearance_mode("dark")
         ctk.set_default_color_theme("blue")
 

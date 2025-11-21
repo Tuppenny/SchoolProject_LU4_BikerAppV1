@@ -37,15 +37,17 @@ class Database:
 
         # ====== Schademeldingen tabel ======
         cursor.execute("""
-            CREATE TABLE IF NOT EXISTS damage_reports (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                name TEXT NOT NULL,
-                email TEXT NOT NULL,
-                bike_type TEXT NOT NULL,
-                damages TEXT NOT NULL,
-                created_at TEXT NOT NULL
-            )
-        """)
+                       CREATE TABLE IF NOT EXISTS damage_reports
+                       (
+                           id INTEGER PRIMARY KEY AUTOINCREMENT,
+                           name TEXT,
+                           email TEXT,
+                           bike_type TEXT,
+                           damages TEXT,
+                           created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+                           status TEXT DEFAULT 'wacht'
+                       )
+                       """)
 
         # ====== Medewerkers tabel ======
         cursor.execute("""
@@ -56,6 +58,7 @@ class Database:
                 role TEXT NOT NULL
             )
         """)
+
 
         # ====== DEMO-ACCOUNTS VEILIG TOEVOEGEN ======
         demo_accounts = [
@@ -98,6 +101,68 @@ class Database:
 
         conn.commit()
         conn.close()
+
+    # ----------------------------------------------------------
+    # Verwijder reservering
+    # ----------------------------------------------------------
+    def delete_reservation(self, reservation_id):
+        conn = self.connect()
+        cursor = conn.cursor()
+
+        cursor.execute("DELETE FROM reservations WHERE id = ?", (reservation_id,))
+        conn.commit()
+        conn.close()
+
+    # ----------------------------------------------------------
+    # Reservering ophalen per ID
+    # ----------------------------------------------------------
+    def get_reservation(self, reservation_id):
+        conn = self.connect()
+        cursor = conn.cursor()
+
+        cursor.execute("""
+                       SELECT id,
+                              name,
+                              email,
+                              start_date,
+                              end_date,
+                              bike_type,
+                              accessories,
+                              comment
+                       FROM reservations
+                       WHERE id = ?
+                       """, (reservation_id,))
+
+        row = cursor.fetchone()
+        conn.close()
+        return row
+
+    # ----------------------------------------------------------
+    # Reservering Zoeken op naam of email
+    # ----------------------------------------------------------
+    def search_reservations(self, keyword):
+        conn = self.connect()
+        cursor = conn.cursor()
+
+        keyword = f"%{keyword}%"
+        cursor.execute("""
+                       SELECT id,
+                              name,
+                              email,
+                              start_date,
+                              end_date,
+                              bike_type,
+                              accessories,
+                              comment
+                       FROM reservations
+                       WHERE name LIKE ?
+                          OR email LIKE ?
+                       ORDER BY created_at DESC
+                       """, (keyword, keyword))
+
+        rows = cursor.fetchall()
+        conn.close()
+        return rows
 
     # ----------------------------------------------------------
     # Schade melden opslaan
@@ -146,3 +211,126 @@ class Database:
             }
 
         return None
+
+    # ----------------------------------------------------------
+    # Reserveringen ophalen
+    # ----------------------------------------------------------
+
+    def get_all_reservations(self):
+        conn = self.connect()
+        cursor = conn.cursor()
+
+        cursor.execute("""
+            SELECT id, name, email, start_date, end_date, bike_type, accessories, comment
+            FROM reservations
+            ORDER BY created_at DESC
+        """)
+
+        rows = cursor.fetchall()
+        conn.close()
+        return rows
+
+    # ----------------------------------------------------------
+    # Alle Schade meldingen ophalen
+    # ----------------------------------------------------------
+    def get_all_damage_reports(self):
+        conn = self.connect()
+        cursor = conn.cursor()
+
+        cursor.execute("""
+            SELECT id, name, email, bike_type, damages, created_at, status
+            FROM damage_reports
+            ORDER BY created_at DESC
+        """)
+
+        rows = cursor.fetchall()
+        conn.close()
+        return rows
+
+    # ----------------------------------------------------------
+    # 1 Schade melding ophalen
+    # ----------------------------------------------------------
+    def get_damage_report(self, report_id):
+        conn = self.connect()
+        cursor = conn.cursor()
+
+        cursor.execute("""
+                       SELECT id, name, email, bike_type, damages, created_at
+                       FROM damage_reports
+                       WHERE id = ?
+                       """, (report_id,))
+
+        row = cursor.fetchone()
+        conn.close()
+        return row
+
+    # ----------------------------------------------------------
+    # Schade Melding verwijderen
+    # ----------------------------------------------------------
+    def delete_damage_report(self, report_id):
+        conn = self.connect()
+        cursor = conn.cursor()
+
+        cursor.execute("DELETE FROM damage_reports WHERE id = ?", (report_id,))
+        conn.commit()
+        conn.close()
+
+    # ----------------------------------------------------------
+    # Zoek Schademelding op naam email of schade
+    # ----------------------------------------------------------
+    def search_damage_reports(self, keyword):
+        conn = self.connect()
+        cursor = conn.cursor()
+
+        keyword = f"%{keyword}%"
+        cursor.execute("""
+                       SELECT id, name, email, bike_type, damages, created_at
+                       FROM damage_reports
+                       WHERE name LIKE ?
+                          OR email LIKE ?
+                          OR bike_type LIKE ?
+                          OR damages LIKE ?
+                       ORDER BY created_at DESC
+                       """, (keyword, keyword, keyword, keyword))
+
+        rows = cursor.fetchall()
+        conn.close()
+        return rows
+
+    # ----------------------------------------------------------
+    # Schade status wijzigen
+    # ----------------------------------------------------------
+    def update_damage_status(self, report_id, new_status):
+        conn = self.connect()
+        cursor = conn.cursor()
+
+        cursor.execute("""
+                       UPDATE damage_reports
+                       SET status = ?
+                       WHERE id = ?
+                       """, (new_status, report_id))
+
+        conn.commit()
+        conn.close()
+
+    # ----------------------------------------------------------
+    # Reparaties ophalen
+    # ----------------------------------------------------------
+    def get_open_repairs(self):
+        conn = self.connect()
+        cursor = conn.cursor()
+
+        cursor.execute("""
+                       SELECT id, name, email, bike_type, damages, created_at, status
+                       FROM damage_reports
+                       WHERE status IN ('wacht', 'reparatie')
+                       ORDER BY CASE status
+                                    WHEN 'reparatie' THEN 0
+                                    WHEN 'wacht' THEN 1
+                                    END,
+                                created_at DESC
+                       """)
+
+        rows = cursor.fetchall()
+        conn.close()
+        return rows
