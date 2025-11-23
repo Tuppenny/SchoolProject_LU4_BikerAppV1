@@ -3,7 +3,7 @@ README – Biker Haaglanden Fietsverhuur Applicatie - Over dit project
 De Biker Haaglanden desktopapplicatie is een CustomTkinter- gebaseerde GUI-oplossing voor het beheren van fietsverhuur, schademeldingen en reparaties.
 De applicatie bevat zowel een klantenkant als een medewerkersportaal, inclusief reserveringenbeheer en interne werkprocessen.
 
-Dit project is geschreven in Python 3.11 en ge
+Dit project is geschreven in Python 3.11 en gebruikt SQLite als lokale database.
 
 
 Benodigdheden
