@@ -87,19 +87,16 @@ class ReservationPage(BasePage):
             values=list(self.bike_data.keys()),
             variable=self.bike_type_var,
             width=260,
-            command=lambda *args: self.update_total_price()
+            command=self.on_bike_change
         )
+
         self.bike_type_menu.grid(row=4, column=1, sticky="w", padx=10, pady=5)
 
         # ==== aantal fietsen ====
         ctk.CTkLabel(self.form_scroll, text="Aantal fietsen:")\
             .grid(row=5, column=0, sticky="e", padx=10, pady=5)
         self.bike_amount_var = ctk.StringVar(value="1")
-        self.bike_amount_entry = ctk.CTkEntry(
-            self.form_scroll,
-            width=80,
-            textvariable=self.bike_amount_var
-        )
+        self.bike_amount_entry = ctk.CTkEntry(self.form_scroll, width=80, textvariable=self.bike_amount_var)
         self.bike_amount_entry.grid(row=5, column=1, sticky="w", padx=10, pady=5)
         self.bike_amount_entry.bind("<KeyRelease>", lambda e: self.update_total_price())
 
@@ -187,6 +184,10 @@ class ReservationPage(BasePage):
         self.update_bike_info()
         self.update_total_price()
 
+    def on_bike_change(self, *args):
+        self.update_bike_info()
+        self.update_total_price()
+
     # ==== datum validatie (AI gemaakt) ====
     def validate_date(self, date_text):
         try:
@@ -242,8 +243,8 @@ class ReservationPage(BasePage):
         if self.access_poncho_var.get():
             acc_total += 4
 
-        # borgborgborgborgborgborgborgborgborgborg
-        borg = 100
+        # ==== BROER FIX: borg per fiets ====
+        borg = 100 * amount
 
         total = bike_total + acc_total + borg
 

@@ -45,7 +45,7 @@ class ReservationsPage(ctk.CTkFrame):
 
         reset_btn = ctk.CTkButton(
             search_frame,
-            text="Reset",
+            text="Refresh",
             width=80,
             command=self.load_reservations
         )
@@ -410,4 +410,8 @@ class ReservationsPage(ctk.CTkFrame):
     # ==== borg status ====
     def set_borg_status(self, reservation_id, new_status):
         self.app.db.update_borg_status(reservation_id, new_status)
+        self.load_reservations()
+
+    # ==== BROER FIX: auto-refresh wanneer pagina geopend ====
+    def on_show(self):
         self.load_reservations()

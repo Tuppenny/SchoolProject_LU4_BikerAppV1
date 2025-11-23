@@ -37,7 +37,7 @@ Installatie: (Terminal / CMD / PowerShell)
 
 4. Installeer alle benodigde libraries 
 
-         pip install customtkinter
+        pip install customtkinter
 
 
         pip install pyinstaller

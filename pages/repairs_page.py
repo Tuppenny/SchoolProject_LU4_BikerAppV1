@@ -226,3 +226,7 @@ class RepairsPage(ctk.CTkFrame):
 
         results = self.app.db.search_damage_reports(keyword)
         self.populate_table(results)
+
+    # ==== BROER FIX: auto-refresh wanneer pagina geopend ====
+    def on_show(self):
+        self.load_repairs()

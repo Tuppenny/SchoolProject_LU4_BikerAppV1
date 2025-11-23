@@ -282,3 +282,7 @@ class DamageReportsPage(ctk.CTkFrame):
         self.app.db.delete_damage_report(report_id)
         popup.destroy()
         self.load_reports()
+
+    # ==== BROER FIX: auto-refresh wanneer pagina geopend ====
+    def on_show(self):
+        self.load_reports()

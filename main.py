@@ -23,7 +23,7 @@ class BikerApp(ctk.CTk):
     def __init__(self):
         super().__init__()
 
-        # ==== groote document ====
+        # ==== grootte document ====
         self.title("Biker Haaglanden")
         self.geometry("1500x1000")
         ctk.set_appearance_mode("dark")
@@ -68,15 +68,16 @@ class BikerApp(ctk.CTk):
         # ==== homepagina ====
         self.show_page("HomePage")
 
-    def show_page(self, page_name: str):
-        """Toon een bepaalde pagina op basis van de class-naam."""
-        page = self.pages.get(page_name)
-        if page:
-            page.tkraise()
-        else:
-            print(f"Page '{page_name}' not found.")
+    def show_page(self, page_name):
+        frame = self.pages[page_name]
+        frame.tkraise()
 
- # ==== I dunno (AI gemaakt (Belangrijk?)) ====
+        # auto-refresh voor pagina’s die dit ondersteunen
+        if hasattr(frame, "on_show"):
+            frame.on_show()
+
+
+# ==== I dunno (AI gemaakt (Belangrijk?)) ====
 if __name__ == "__main__":
     app = BikerApp()
     app.mainloop()
