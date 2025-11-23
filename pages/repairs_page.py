@@ -8,11 +8,11 @@ class RepairsPage(ctk.CTkFrame):
         super().__init__(parent)
         self.app = app
 
-        # ===== HEADER =====
+        # ===== header titel =====
         header = PortalHeader(self, app, "Reparaties")
         header.pack(fill="x")
 
-        # ===== CONTENT FRAME =====
+        # ===== content frame (AI gemaakt) =====
         content_frame = ctk.CTkFrame(self, fg_color="transparent")
         content_frame.pack(fill="both", expand=True, padx=20, pady=20)
 
@@ -23,7 +23,36 @@ class RepairsPage(ctk.CTkFrame):
         )
         title_label.pack(pady=(0, 20))
 
-        # ===== TABLE FRAME =====
+        top_bar = ctk.CTkFrame(content_frame, fg_color="transparent")
+        top_bar.pack(pady=(0, 15))
+
+        # ==== zoekveld ====
+        self.search_entry = ctk.CTkEntry(
+            top_bar,
+            width=300,
+            placeholder_text="Zoek op naam, fiets of schade"
+        )
+        self.search_entry.pack(side="left", padx=5)
+
+        # ==== zoekknop ====
+        search_btn = ctk.CTkButton(
+            top_bar,
+            text="Zoeken",
+            width=100,
+            command=self.search_repairs
+        )
+        search_btn.pack(side="left", padx=5)
+
+        # ==== refresh knop ====
+        refresh_btn = ctk.CTkButton(
+            top_bar,
+            text="Refresh",
+            width=90,
+            command=self.load_repairs
+        )
+        refresh_btn.pack(side="left", padx=5)
+
+        # ===== table frame (AI gemaakt) =====
         self.table_frame = ctk.CTkScrollableFrame(
             content_frame,
             width=950,
@@ -32,7 +61,7 @@ class RepairsPage(ctk.CTkFrame):
         )
         self.table_frame.pack(fill="both", expand=True)
 
-        # Tabelkoppen
+        # ==== Tabeltitels ====
         headers = [
             "Status", "ID", "Naam", "E-mail",
             "Fiets", "Schade", "Datum", "Acties"
@@ -46,19 +75,16 @@ class RepairsPage(ctk.CTkFrame):
             )
             lbl.grid(row=0, column=idx, padx=10, pady=10)
 
-        # Initial load
+        # ==== initial load ====
         self.load_repairs()
 
-    # ==========================================================
-    #       LADEN VAN REPARATIES
-    # ==========================================================
+    # ==== reparaties laden ====
     def load_repairs(self):
         data = self.app.db.get_open_repairs()
         self.populate_table(data)
 
-    # ==========================================================
-    #             TABEL VULLEN
-    # ==========================================================
+
+    # ==== table vullen (AI gemaakt)====
     def populate_table(self, data):
         # Oude rijen verwijderen behalve headers
         for widget in self.table_frame.winfo_children():
@@ -80,7 +106,7 @@ class RepairsPage(ctk.CTkFrame):
             created_at = row[5]
             status = row[6]
 
-            # ===== STATUS BADGE =====
+            # ===== status =====
             color = "#777777"  # wacht
             if status == "reparatie":
                 color = "#e67e22"
@@ -98,14 +124,14 @@ class RepairsPage(ctk.CTkFrame):
             )
             status_label.grid(row=row_index, column=0, padx=10, pady=8)
 
-            # ===== DATA CELLS =====
+            # ===== data cells (AI gemaakt) =====
             columns = [
                 report_id, name, email, bike, damages, created_at
             ]
 
             for col_index, cell in enumerate(columns, start=1):
 
-                # Schade kolom wrappen
+                # ==== Schade kolom wrappen ====
                 if col_index == 5:
                     lbl = ctk.CTkLabel(
                         self.table_frame,
@@ -123,11 +149,11 @@ class RepairsPage(ctk.CTkFrame):
 
                 lbl.grid(row=row_index, column=col_index, padx=10, pady=8, sticky="w")
 
-            # ===== ACTIE BUTTONS =====
+            # ===== actie knoppen\ =====
             action_frame = ctk.CTkFrame(self.table_frame, fg_color="transparent")
             action_frame.grid(row=row_index, column=7, padx=10, pady=8)
 
-            # BEKIJKEN
+            # ==== bekjken ====
             view_btn = ctk.CTkButton(
                 action_frame,
                 text="Bekijken",
@@ -136,7 +162,7 @@ class RepairsPage(ctk.CTkFrame):
             )
             view_btn.pack(side="left", padx=5)
 
-            # MARKEREN ALS IN REPARATIE
+            # ==== start reparatie ====
             if status == "wacht":
                 rep_btn = ctk.CTkButton(
                     action_frame,
@@ -147,7 +173,7 @@ class RepairsPage(ctk.CTkFrame):
                 )
                 rep_btn.pack(side="left", padx=5)
 
-            # MARKEREN ALS GEREPAREERD
+            # ==== gerepareerd ====
             if status == "reparatie":
                 done_btn = ctk.CTkButton(
                     action_frame,
@@ -158,16 +184,13 @@ class RepairsPage(ctk.CTkFrame):
                 )
                 done_btn.pack(side="left", padx=5)
 
-    # ==========================================================
-    #        STATUS UPDATEN
-    # ==========================================================
+    # ==== update status ====
+
     def set_status(self, report_id, new_status):
         self.app.db.update_damage_status(report_id, new_status)
         self.load_repairs()
 
-    # ==========================================================
-    #        DETAILS POPUP
-    # ==========================================================
+    # ==== popup ding ====
     def view_popup(self, report_id):
         data = self.app.db.get_damage_report(report_id)
         if not data:
@@ -191,3 +214,15 @@ class RepairsPage(ctk.CTkFrame):
         for label, value in fields:
             lbl = ctk.CTkLabel(popup, text=f"{label}: {value}", font=ctk.CTkFont(size=14))
             lbl.pack(pady=10, anchor="w", padx=20)
+
+
+    # ==== searchbar ====
+
+    def search_repairs(self):
+        keyword = self.search_entry.get().strip()
+        if keyword == "":
+            self.load_repairs()
+            return
+
+        results = self.app.db.search_damage_reports(keyword)
+        self.populate_table(results)

@@ -6,7 +6,7 @@ class BasePage(ctk.CTkFrame):
 
         self.app = app
 
-        # ----------- TOP NAV BAR -----------
+        # ==== topnav ====
         nav_bar = ctk.CTkFrame(
             self,
             height=60,
@@ -17,7 +17,7 @@ class BasePage(ctk.CTkFrame):
         shadow = ctk.CTkFrame(self, height=2, fg_color="#1E1E1E")
         shadow.pack(fill="x")
 
-        # Logo
+        # ==== logo ===
         logo_label = ctk.CTkLabel(
             nav_bar,
             text="Biker Haaglanden",
@@ -33,14 +33,14 @@ class BasePage(ctk.CTkFrame):
         )
         staff_button.pack(side="right", padx=20, pady=10)
 
-        # ----------- HEADER MENU BAR ----------
+        # ==== header buttonbar ====
         header_bar = ctk.CTkFrame(self, height=45, fg_color="#252525")
         header_bar.pack(fill="x")
 
         nav_container = ctk.CTkFrame(header_bar, fg_color="transparent")
         nav_container.pack(side="right", padx=30, pady=5)
 
-        # ----- Helper functies -----
+        # ==== helper functies ====
         def make_nav_item(text, page=None):
             label = ctk.CTkLabel(
                 nav_container,
@@ -50,7 +50,7 @@ class BasePage(ctk.CTkFrame):
                 cursor="hand2"
             )
 
-            # Hover underline
+            # ==== hover underline (doet raar op mac) ====
             def on_enter(e):
                 label.configure(font=ctk.CTkFont(size=16, underline=True))
 
@@ -60,13 +60,12 @@ class BasePage(ctk.CTkFrame):
             label.bind("<Enter>", on_enter)
             label.bind("<Leave>", on_leave)
 
-            # Navigation
             if page:
                 label.bind("<Button-1>", lambda e: app.show_page(page))
 
             return label
 
-        # ----- Menu items -----
+        # ==== menu items ====
         home_btn = make_nav_item("Home", "HomePage")
         home_btn.pack(side="left", padx=12)
 
@@ -79,12 +78,6 @@ class BasePage(ctk.CTkFrame):
         divS = ctk.CTkFrame(nav_container, width=2, height=20, fg_color="#444444")
         divS.pack(side="left", padx=12)
 
-        damage_btn = make_nav_item("Schade melden", "DamagePage")
-        damage_btn.pack(side="left", padx=12)
-
-        div2 = ctk.CTkFrame(nav_container, width=2, height=20, fg_color="#444444")
-        div2.pack(side="left", padx=12)
-
         over_btn = make_nav_item("Over ons", "OverOnsPage")
         over_btn.pack(side="left", padx=12)
 
@@ -94,7 +87,7 @@ class BasePage(ctk.CTkFrame):
         contact_btn = make_nav_item("Contact", "ContactPage")
         contact_btn.pack(side="left", padx=12)
 
-        # ----------- MAX-WIDTH CONTENT AREA ----------
+        # ==== max-width content area (AI gemaakt) ====
         self.content_container = ctk.CTkFrame(self, fg_color="transparent")
         self.content_container.pack(fill="both", expand=True)
 

@@ -8,32 +8,23 @@ class ReservationPage(BasePage):
     def __init__(self, parent, app):
         super().__init__(parent, app)
 
-        # ===== FIETS DATA =====
+        # ==== fiets data ====
         self.bike_data = {
-            "Herenfiets": {
-                "price": "€ 777,-",
-                "desc": (
-                    "Lorem ipsum dolor sit amet, consectetur adipiscing elit. "
-                    "Nullam feugiat urna ac mauris molestie, sed varius massa luctus."
-                )
-            },
-            "Damesfiets": {
-                "price": "€ 888,-",
-                "desc": (
-                    "Lorem ipsum dolor sit amet, consectetur adipiscing elit. "
-                    "Vivamus sit amet dui in velit ultricies tincidunt sed non leo."
-                )
-            },
-            "E-bike": {
-                "price": "€ 999,-",
-                "desc": (
-                    "Lorem ipsum dolor sit amet, consectetur adipiscing elit. "
-                    "Praesent convallis lacus at mauris vulputate, vel cursus justo pulvinar."
-                )
-            },
+            "Herenfiets": {"price": 15, "desc": "Comfortabele herenfiets voor dagelijks gebruik. Ideaal voor stadsritten en korte toertochten."},
+            "Damesfiets": {"price": 15, "desc": "Praktische damesfiets met lage instap. Geschikt voor zowel korte als lange ritten."},
+            "E-bike": {"price": 27, "desc": "Elektrische fiets met krachtige ondersteuning. Perfect voor langere ritten en tegenwind."},
         }
 
-        # ===== TITEL =====
+        # ==== accessoires prijzen ====
+        self.accessory_prices = {
+            "Kinderzitje": 5,
+            "Helm": 5,
+            "Fietstas": 7,
+            "Extra slot": 6,
+            "Regenponcho": 4
+        }
+
+        # ==== titel ====
         title_label = ctk.CTkLabel(
             self.inner_frame,
             text="Nieuwe reservering",
@@ -41,132 +32,225 @@ class ReservationPage(BasePage):
         )
         title_label.grid(row=0, column=0, columnspan=2, sticky="w", pady=(10, 10))
 
-        # ===== LINKERZIJDE (FORMULIER) =====
+        # ==== layout configuratie ====
+        self.inner_frame.grid_rowconfigure(1, weight=1)
+        self.inner_frame.grid_columnconfigure(0, weight=1)
+        self.inner_frame.grid_columnconfigure(1, weight=0)
+
+        # ==== linkerzijde: formulier container ====
         form_frame = ctk.CTkFrame(self.inner_frame, corner_radius=10)
         form_frame.grid(row=1, column=0, sticky="nsew", padx=(0, 20), pady=10)
+        form_frame.grid_rowconfigure(0, weight=1)
+        form_frame.grid_columnconfigure(0, weight=1)
 
-        form_inner = ctk.CTkFrame(form_frame, fg_color="transparent")
-        form_inner.pack(padx=20, pady=20, fill="x")
+        # ==== scrollbaar formulier ====
+        self.form_scroll = ctk.CTkScrollableFrame(form_frame, fg_color="transparent")
+        self.form_scroll.grid(row=0, column=0, sticky="nsew", padx=10, pady=10)
 
-        # Naam
-        ctk.CTkLabel(form_inner, text="Naam klant:").grid(row=0, column=0, sticky="e", padx=10, pady=5)
-        self.name_entry = ctk.CTkEntry(form_inner, width=260)
+        self.form_scroll.grid_columnconfigure(0, weight=0)
+        self.form_scroll.grid_columnconfigure(1, weight=1)
+
+        # ==== formulier velden ====
+
+        # ==== naam ====
+        ctk.CTkLabel(self.form_scroll, text="Naam klant:")\
+            .grid(row=0, column=0, sticky="e", padx=10, pady=5)
+        self.name_entry = ctk.CTkEntry(self.form_scroll, width=260)
         self.name_entry.grid(row=0, column=1, sticky="w", padx=10, pady=5)
 
-        # Email
-        ctk.CTkLabel(form_inner, text="E-mailadres:").grid(row=1, column=0, sticky="e", padx=10, pady=5)
-        self.email_entry = ctk.CTkEntry(form_inner, width=260)
+        # ==== email ====
+        ctk.CTkLabel(self.form_scroll, text="E-mailadres:")\
+            .grid(row=1, column=0, sticky="e", padx=10, pady=5)
+        self.email_entry = ctk.CTkEntry(self.form_scroll, width=260)
         self.email_entry.grid(row=1, column=1, sticky="w", padx=10, pady=5)
 
-        # Startdatum
-        ctk.CTkLabel(form_inner, text="Startdatum (dd-mm-jjjj):").grid(row=2, column=0, sticky="e", padx=10, pady=5)
-        self.start_entry = ctk.CTkEntry(form_inner, width=260)
+        # ==== startdatum =====
+        ctk.CTkLabel(self.form_scroll, text="Startdatum (dd-mm-jjjj):")\
+            .grid(row=2, column=0, sticky="e", padx=10, pady=5)
+        self.start_entry = ctk.CTkEntry(self.form_scroll, width=260)
         self.start_entry.grid(row=2, column=1, sticky="w", padx=10, pady=5)
+        self.start_entry.bind("<KeyRelease>", lambda e: self.update_total_price())
 
-        # Einddatum
-        ctk.CTkLabel(form_inner, text="Einddatum (dd-mm-jjjj):").grid(row=3, column=0, sticky="e", padx=10, pady=5)
-        self.end_entry = ctk.CTkEntry(form_inner, width=260)
+        # ==== einddatum ====
+        ctk.CTkLabel(self.form_scroll, text="Einddatum (dd-mm-jjjj):")\
+            .grid(row=3, column=0, sticky="e", padx=10, pady=5)
+        self.end_entry = ctk.CTkEntry(self.form_scroll, width=260)
         self.end_entry.grid(row=3, column=1, sticky="w", padx=10, pady=5)
+        self.end_entry.bind("<KeyRelease>", lambda e: self.update_total_price())
 
-        # Type fiets
-        ctk.CTkLabel(form_inner, text="Type fiets:").grid(row=4, column=0, sticky="e", padx=10, pady=5)
+        # ==== type fiets ====
+        ctk.CTkLabel(self.form_scroll, text="Type fiets:")\
+            .grid(row=4, column=0, sticky="e", padx=10, pady=5)
         self.bike_type_var = ctk.StringVar(value="Herenfiets")
         self.bike_type_menu = ctk.CTkOptionMenu(
-            form_inner,
-            values=["Herenfiets", "Damesfiets", "E-bike"],
+            self.form_scroll,
+            values=list(self.bike_data.keys()),
             variable=self.bike_type_var,
             width=260,
-            command=self.on_bike_type_change
+            command=lambda *args: self.update_total_price()
         )
         self.bike_type_menu.grid(row=4, column=1, sticky="w", padx=10, pady=5)
 
-        # Accessoires
-        ctk.CTkLabel(form_inner, text="Accessoires:").grid(row=5, column=0, sticky="ne", padx=10, pady=5)
+        # ==== aantal fietsen ====
+        ctk.CTkLabel(self.form_scroll, text="Aantal fietsen:")\
+            .grid(row=5, column=0, sticky="e", padx=10, pady=5)
+        self.bike_amount_var = ctk.StringVar(value="1")
+        self.bike_amount_entry = ctk.CTkEntry(
+            self.form_scroll,
+            width=80,
+            textvariable=self.bike_amount_var
+        )
+        self.bike_amount_entry.grid(row=5, column=1, sticky="w", padx=10, pady=5)
+        self.bike_amount_entry.bind("<KeyRelease>", lambda e: self.update_total_price())
 
+        # ==== accessores ====
+        ctk.CTkLabel(self.form_scroll, text="Accessoires:")\
+            .grid(row=6, column=0, sticky="ne", padx=10, pady=(10, 5))
+
+        # ==== accessores opties ====
         self.access_childseat_var = ctk.BooleanVar()
         self.access_helmet_var = ctk.BooleanVar()
+        self.access_bag_var = ctk.BooleanVar()
+        self.access_lock_var = ctk.BooleanVar()
+        self.access_poncho_var = ctk.BooleanVar()
 
-        ctk.CTkCheckBox(
-            form_inner,
-            text="Kinderzitje",
-            variable=self.access_childseat_var
-        ).grid(row=5, column=1, sticky="w", padx=10, pady=2)
+        ctk.CTkCheckBox(self.form_scroll, text="Kinderzitje (+ €5)",
+                        variable=self.access_childseat_var,
+                        command=self.update_total_price)\
+            .grid(row=6, column=1, sticky="w", padx=10, pady=2)
 
-        ctk.CTkCheckBox(
-            form_inner,
-            text="Helm",
-            variable=self.access_helmet_var
-        ).grid(row=6, column=1, sticky="w", padx=10, pady=2)
+        ctk.CTkCheckBox(self.form_scroll, text="Helm (+ €5)",
+                        variable=self.access_helmet_var,
+                        command=self.update_total_price)\
+            .grid(row=7, column=1, sticky="w", padx=10, pady=2)
 
-        # Opmerkingen
-        ctk.CTkLabel(form_inner, text="Opmerkingen (optioneel):").grid(row=7, column=0, sticky="ne", padx=10, pady=5)
-        self.comment_entry = ctk.CTkTextbox(form_inner, width=260, height=80)
-        self.comment_entry.grid(row=7, column=1, sticky="w", padx=10, pady=5)
+        ctk.CTkCheckBox(self.form_scroll, text="Fietstas (+ €7)",
+                        variable=self.access_bag_var,
+                        command=self.update_total_price)\
+            .grid(row=8, column=1, sticky="w", padx=10, pady=2)
 
-        # Opslaan
+        ctk.CTkCheckBox(self.form_scroll, text="Extra slot (+ €6)",
+                        variable=self.access_lock_var,
+                        command=self.update_total_price)\
+            .grid(row=9, column=1, sticky="w", padx=10, pady=2)
+
+        ctk.CTkCheckBox(self.form_scroll, text="Regenponcho (+ €4)",
+                        variable=self.access_poncho_var,
+                        command=self.update_total_price)\
+            .grid(row=10, column=1, sticky="w", padx=10, pady=2)
+
+        # ==== opmerking ====
+        ctk.CTkLabel(self.form_scroll, text="Opmerking (optioneel):")\
+            .grid(row=11, column=0, sticky="ne", padx=10, pady=(15, 5))
+        self.comment_entry = ctk.CTkTextbox(self.form_scroll, width=260, height=80)
+        self.comment_entry.grid(row=11, column=1, sticky="w", padx=10, pady=(5, 15))
+
+        # ==== totaalprijs label ====
+        self.total_price_label = ctk.CTkLabel(
+            self.form_scroll,
+            text="Totaalprijs: €0",
+            font=ctk.CTkFont(size=20, weight="bold")
+        )
+        self.total_price_label.grid(row=12, column=1, sticky="w", padx=10, pady=(20, 10))
+
+        # ==== submit knop ====
         submit_button = ctk.CTkButton(
-            self.inner_frame,
+            self.form_scroll,
             text="Reservering opslaan",
             width=200,
             command=self.submit_reservation
         )
-        submit_button.grid(row=2, column=0, sticky="w", pady=10)
+        submit_button.grid(row=13, column=1, sticky="w", padx=10, pady=(10, 20))
 
-        # ===== RECHTERZIJDE (BIKE INFO) =====
+        # ==== fiets info ====
         info_frame = ctk.CTkFrame(self.inner_frame, corner_radius=10)
         info_frame.grid(row=1, column=1, sticky="n", pady=10)
 
         info_inner = ctk.CTkFrame(info_frame, fg_color="transparent")
         info_inner.pack(padx=20, pady=20)
 
-        self.info_title_label = ctk.CTkLabel(
-            info_inner, text="", font=ctk.CTkFont(size=22, weight="bold")
-        )
+        self.info_title_label = ctk.CTkLabel(info_inner, text="", font=ctk.CTkFont(size=22, weight="bold"))
         self.info_title_label.pack(pady=(0, 10))
 
-        self.info_price_label = ctk.CTkLabel(
-            info_inner, text="", font=ctk.CTkFont(size=20, weight="bold")
-        )
+        self.info_price_label = ctk.CTkLabel(info_inner, text="", font=ctk.CTkFont(size=20, weight="bold"))
         self.info_price_label.pack(pady=(0, 10))
+
+        self.info_borg_label = ctk.CTkLabel(info_inner, text="Borg: €100",
+                                            font=ctk.CTkFont(size=18, weight="bold"))
+        self.info_borg_label.pack(pady=(0, 10))
 
         self.info_desc_label = ctk.CTkLabel(
             info_inner, text="", font=ctk.CTkFont(size=14), wraplength=260, justify="left"
         )
         self.info_desc_label.pack(pady=(0, 10))
 
-        # Kolom layout
-        self.inner_frame.grid_columnconfigure(0, weight=1)
-        self.inner_frame.grid_columnconfigure(1, weight=1)
-
-        # Eerste keer info laden
         self.update_bike_info()
+        self.update_total_price()
 
-    # =====================================================
-    #              DATUM VALIDATIE FUNCTIE
-    # =====================================================
+    # ==== datum validatie (AI gemaakt) ====
     def validate_date(self, date_text):
         try:
             return datetime.strptime(date_text, "%d-%m-%Y")
         except ValueError:
             return None
 
-    # =====================================================
-    #                  BIKE INFO UPDATES
-    # =====================================================
-    def on_bike_type_change(self, *_):
-        self.update_bike_info()
-
+    # ==== fiets info updaten ====
     def update_bike_info(self):
         bike_type = self.bike_type_var.get()
         data = self.bike_data[bike_type]
 
         self.info_title_label.configure(text=bike_type)
-        self.info_price_label.configure(text=f"Prijs: {data['price']}")
+        self.info_price_label.configure(text=f"Prijs per dag: €{data['price']}")
         self.info_desc_label.configure(text=data["desc"])
 
-    # =====================================================
-    #                  RESERVERING OPSLAAN
-    # =====================================================
+    # ==== totaalprijs berekenen (AI geholpen) ====
+    def update_total_price(self):
+        # datums ophalen
+        start = self.start_entry.get().strip()
+        end = self.end_entry.get().strip()
+
+        start_date = self.validate_date(start)
+        end_date = self.validate_date(end)
+
+        # aantal dagen berekenen
+        if start_date and end_date and end_date >= start_date:
+            days = (end_date - start_date).days + 1
+        else:
+            days = 0
+
+        # fietsprijs × dagen × aantal
+        bike_type = self.bike_type_var.get()
+        bike_price = self.bike_data[bike_type]["price"]
+
+        try:
+            amount = int(self.bike_amount_var.get())
+        except:
+            amount = 1
+
+        bike_total = bike_price * days * amount
+
+        # accessoires optellen
+        acc_total = 0
+        if self.access_childseat_var.get():
+            acc_total += 5
+        if self.access_helmet_var.get():
+            acc_total += 5
+        if self.access_bag_var.get():
+            acc_total += 7
+        if self.access_lock_var.get():
+            acc_total += 6
+        if self.access_poncho_var.get():
+            acc_total += 4
+
+        # borgborgborgborgborgborgborgborgborgborg
+        borg = 100
+
+        total = bike_total + acc_total + borg
+
+        self.total_price_label.configure(text=f"Totaalprijs: €{total}")
+        return total, borg
+
+    # ==== reservering opslaan ====
     def submit_reservation(self):
         name = self.name_entry.get().strip()
         email = self.email_entry.get().strip()
@@ -177,42 +261,61 @@ class ReservationPage(BasePage):
             messagebox.showerror("Fout", "Vul alle verplichte velden in.")
             return
 
-        # Datum validatie
+        # ==== datummen controleren ====
         start_date = self.validate_date(start)
         end_date = self.validate_date(end)
 
         if not start_date:
-            messagebox.showerror("Fout", "Startdatum is ongeldig. Gebruik dd-mm-jjjj.")
+            messagebox.showerror("Fout", "Startdatum is ongeldig (dd-mm-jjjj).")
             return
-
         if not end_date:
-            messagebox.showerror("Fout", "Einddatum is ongeldig. Gebruik dd-mm-jjjj.")
+            messagebox.showerror("Fout", "Einddatum is ongeldig (dd-mm-jjjj).")
             return
-
         if end_date < start_date:
-            messagebox.showerror("Fout", "Einddatum moet na de startdatum liggen.")
+            messagebox.showerror("Fout", "Einddatum mag niet vóór de startdatum liggen.")
             return
 
-        bike = self.bike_type_var.get()
+        # ==== aantal fietsen valideren ====
+        try:
+            amount = int(self.bike_amount_var.get())
+            if amount < 1:
+                raise ValueError
+        except:
+            messagebox.showerror("Fout", "Aantal fietsen moet minimaal 1 zijn.")
+            return
 
-        # ACCESSOIRES
+        bike_type = self.bike_type_var.get()
+        bike_label = f"{bike_type} (x{amount})"
+
+        # ==== accessoires verzamelen ====
         accs = []
         if self.access_childseat_var.get():
-            accs.append("Kinderzitje")
+            accs.append("Kinderzitje (+5€)")
         if self.access_helmet_var.get():
-            accs.append("Helm")
+            accs.append("Helm (+5€)")
+        if self.access_bag_var.get():
+            accs.append("Fietstas (+7€)")
+        if self.access_lock_var.get():
+            accs.append("Extra slot (+6€)")
+        if self.access_poncho_var.get():
+            accs.append("Regenponcho (+4€)")
 
         accs_text = ", ".join(accs) if accs else "Geen"
 
-        # OPSLAAN
+        # ==== prijs berekenen ====
+        total, borg = self.update_total_price()
+
+        # ==== database save ====
         self.app.db.save_reservation(
             name=name,
             email=email,
             start_date=start,
             end_date=end,
-            bike_type=bike,
+            bike_type=bike_label,
             accessories=accs_text,
-            comment=self.comment_entry.get("1.0", "end").strip()
+            comment=self.comment_entry.get("1.0", "end").strip(),
+            total_price=total,
+            borg=borg
         )
 
         messagebox.showinfo("Succes", "Reservering succesvol opgeslagen!")

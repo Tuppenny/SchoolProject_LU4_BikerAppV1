@@ -7,7 +7,7 @@ class PortalHeader(ctk.CTkFrame):
         self.app = app
         self.title_text = title
 
-        # LOGO links
+        # ==== logo (word later plaatje mischien) ====
         logo_label = ctk.CTkLabel(
             self,
             text="Biker Haaglanden",
@@ -15,7 +15,7 @@ class PortalHeader(ctk.CTkFrame):
         )
         logo_label.place(x=20, rely=0.5, anchor="w")
 
-        # TITEL midden
+        # ==== titel header ====
         center_label = ctk.CTkLabel(
             self,
             text=title,
@@ -23,7 +23,7 @@ class PortalHeader(ctk.CTkFrame):
         )
         center_label.place(relx=0.5, rely=0.5, anchor="center")
 
-        # UITLOG-knop rechts
+        # ==== uitloggen ====
         logout_btn = ctk.CTkButton(
             self,
             text="Uitloggen",
@@ -34,7 +34,7 @@ class PortalHeader(ctk.CTkFrame):
         )
         logout_btn.place(relx=1.0, x=-20, rely=0.5, anchor="e")
 
-        # TERUG-knop rechts (naast uitloggen)
+        # ==== terug naar portaalknop ====
         back_btn = ctk.CTkButton(
             self,
             text="← Terug",
@@ -45,24 +45,21 @@ class PortalHeader(ctk.CTkFrame):
         )
         back_btn.place(relx=1.0, x=-120, rely=0.5, anchor="e")
 
-    # =====================
-    #   TERUG KNOP
-    # =====================
+
+    # ==== medewerker rollen (later) ====
     def go_back(self):
         role = self.app.logged_in_user["role"]
 
         if role == "manager":
             self.app.show_page("ManagerPortalPage")
         elif role == "balie":
-            self.app.show_page("BaliePortalPage")     # JE VOEGT DIT LATER TOE
+            self.app.show_page("BaliePortalPage")     # later toeveogen
         elif role == "reparateur":
-            self.app.show_page("ReparateurPortalPage")  # JE VOEGT DIT LATER TOE
+            self.app.show_page("ReparateurPortalPage")  # later toeveogen
         else:
             self.app.show_page("StaffLoginPage")
 
-    # =====================
-    #   UITLOG POPUP
-    # =====================
+    # ==== uitloggen popup =====
     def confirm_logout(self):
         popup = ctk.CTkToplevel(self)
         popup.title("Uitloggen")

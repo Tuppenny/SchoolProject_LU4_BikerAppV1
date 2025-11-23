@@ -5,7 +5,6 @@ class HomePage(BasePage):
     def __init__(self, parent, app):
         super().__init__(parent, app)
 
-        # Alle content komt in self.inner_frame
         title = ctk.CTkLabel(
             self.inner_frame,
             text="Welkom bij Biker Haaglanden",

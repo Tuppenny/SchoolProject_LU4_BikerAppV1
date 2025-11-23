@@ -1,13 +1,22 @@
 import customtkinter as ctk
 from tkinter import messagebox
-from base_page import BasePage
+from pages.portal_header import PortalHeader
 
 
-class DamagePage(BasePage):
+class DamagePage(ctk.CTkFrame):
     def __init__(self, parent, app):
-        super().__init__(parent, app)
+        super().__init__(parent)
+        self.app = app
 
-        # ===== TITEL =====
+        # ===== header =====
+        header = PortalHeader(self, app, "Schademelding toevoegen")
+        header.pack(fill="x")
+
+        # ===== inner container =====
+        self.inner_frame = ctk.CTkFrame(self, fg_color="transparent")
+        self.inner_frame.pack(fill="both", expand=True, padx=20, pady=20)
+
+        # ===== titel =====
         title_label = ctk.CTkLabel(
             self.inner_frame,
             text="Schade melden",
@@ -15,24 +24,24 @@ class DamagePage(BasePage):
         )
         title_label.grid(row=0, column=0, columnspan=2, sticky="w", pady=(10, 10))
 
-        # ===== LINKERZIJDE — FORMULIER =====
+        # ===== formulier links =====
         form_frame = ctk.CTkFrame(self.inner_frame, corner_radius=10)
         form_frame.grid(row=1, column=0, sticky="nsew", padx=(0, 20), pady=10)
 
         form_inner = ctk.CTkFrame(form_frame, fg_color="transparent")
         form_inner.pack(padx=20, pady=20, fill="x")
 
-        # Naam klant
+        # naam
         ctk.CTkLabel(form_inner, text="Naam klant:").grid(row=0, column=0, sticky="e", padx=10, pady=5)
         self.name_entry = ctk.CTkEntry(form_inner, width=260)
         self.name_entry.grid(row=0, column=1, sticky="w", padx=10, pady=5)
 
-        # Email
+        # e-mail
         ctk.CTkLabel(form_inner, text="E-mailadres:").grid(row=1, column=0, sticky="e", padx=10, pady=5)
         self.email_entry = ctk.CTkEntry(form_inner, width=260)
         self.email_entry.grid(row=1, column=1, sticky="w", padx=10, pady=5)
 
-        # Type fiets
+        # type fiets
         ctk.CTkLabel(form_inner, text="Type fiets:").grid(row=2, column=0, sticky="e", padx=10, pady=5)
         self.bike_type_var = ctk.StringVar(value="Herenfiets")
         self.bike_menu = ctk.CTkOptionMenu(
@@ -43,7 +52,7 @@ class DamagePage(BasePage):
         )
         self.bike_menu.grid(row=2, column=1, sticky="w", padx=10, pady=5)
 
-        # Schade opties
+        # schade opties
         ctk.CTkLabel(form_inner, text="Schade type:").grid(row=3, column=0, sticky="ne", padx=10, pady=5)
 
         self.damage_flat_var = ctk.BooleanVar()
@@ -73,7 +82,7 @@ class DamagePage(BasePage):
         self.other_text = ctk.CTkTextbox(form_inner, width=260, height=80)
         self.other_text.grid(row=8, column=1, sticky="w", padx=10, pady=5)
 
-        # Opslaan-knop
+        # opslaan-knop
         submit_button = ctk.CTkButton(
             self.inner_frame,
             text="Schademelding opslaan",
@@ -82,22 +91,20 @@ class DamagePage(BasePage):
         )
         submit_button.grid(row=2, column=0, sticky="w", pady=10)
 
-        # Layout
+        # layout
         self.inner_frame.grid_columnconfigure(0, weight=1)
         self.inner_frame.grid_columnconfigure(1, weight=1)
 
-    # ===== OPSLAAN VAN DE SCHADE =====
+    # ===== schade opslaan =====
     def save_damage(self):
         name = self.name_entry.get().strip()
         email = self.email_entry.get().strip()
         bike_type = self.bike_type_var.get()
 
-        # Minimaal deze velden verplicht
         if not name or not email:
             messagebox.showerror("Fout", "Naam en e-mail zijn verplicht.")
             return
 
-        # Verzamel schade
         damages = []
         if self.damage_flat_var.get():
             damages.append("Lekke band")
@@ -116,8 +123,8 @@ class DamagePage(BasePage):
 
         damages_str = ", ".join(damages)
 
-        # Opslaan in database
-        self.app.db.save_damage_report(
+        # opslaan in database
+        self.app.db.add_damage_report(
             name=name,
             email=email,
             bike_type=bike_type,
@@ -126,7 +133,10 @@ class DamagePage(BasePage):
 
         messagebox.showinfo("Succes", "Schade succesvol opgeslagen.")
 
-        # Velden resetten
+        # terug naar schadeoverzicht
+        self.app.show_page("DamageReportsPage")
+
+        # velden resetten
         self.name_entry.delete(0, "end")
         self.email_entry.delete(0, "end")
         self.other_text.delete("1.0", "end")

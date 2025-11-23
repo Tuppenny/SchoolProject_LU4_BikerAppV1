@@ -49,14 +49,12 @@ class ManagerPortalPage(ctk.CTkFrame):
         super().__init__(parent)
         self.app = app
 
-        # ===========================
-        #       TOP NAVIGATION
-        # ===========================
+        # ==== top nav ====
 
         top_nav = ctk.CTkFrame(self, height=60, fg_color="#2E2E2E")
         top_nav.pack(fill="x")
 
-        # LOGO (links, verticaal gecentreerd)
+        # logo (word later plaatje misschien)
         logo_label = ctk.CTkLabel(
             top_nav,
             text="Biker Haaglanden",
@@ -64,7 +62,7 @@ class ManagerPortalPage(ctk.CTkFrame):
         )
         logo_label.place(x=20, rely=0.5, anchor="w")  # <-- verticaal gecentreerd
 
-        # TITEL (midden)
+        # header titel
         center_label = ctk.CTkLabel(
             top_nav,
             text="Medewerkerportaal",
@@ -72,7 +70,7 @@ class ManagerPortalPage(ctk.CTkFrame):
         )
         center_label.place(relx=0.5, rely=0.5, anchor="center")  # <-- perfect gecentreerd
 
-        # UITLOGKNOP (rechts, verticaal gecentreerd)
+        # uitloggen knop
         logout_btn = ctk.CTkButton(
             top_nav,
             text="Uitloggen",
@@ -83,9 +81,7 @@ class ManagerPortalPage(ctk.CTkFrame):
         )
         logout_btn.place(relx=1.0, x=-20, rely=0.5, anchor="e")
 
-        # ===========================
-        #     MAIN BUTTON SECTION
-        # ===========================
+        # ==== body knoppen ====
 
         main_frame = ctk.CTkFrame(self, fg_color="transparent")
         main_frame.pack(expand=True)
@@ -94,17 +90,17 @@ class ManagerPortalPage(ctk.CTkFrame):
         for col in range(3):
             main_frame.grid_columnconfigure(col, weight=1)
 
-        # Knopafmetingen
+        # Knopafmetingen (AI gemaakt)
         BTN_WIDTH = 150
         BTN_HEIGHT = 150
 
         BUTTON_PADX = 15
         BUTTON_PADY = 20
 
-        # ----------- KNOP: RESERVERINGEN -----------
+        # ==== reserverinoverzicht ====
         reservations_btn = ctk.CTkButton(
             main_frame,
-            text="Reserveringen",
+            text="Reserveringoverzicht",
             width=BTN_WIDTH,
             height=BTN_HEIGHT,
             font=ctk.CTkFont(size=16, weight="bold"),
@@ -112,10 +108,10 @@ class ManagerPortalPage(ctk.CTkFrame):
         )
         reservations_btn.grid(row=0, column=0, padx=BUTTON_PADX, pady=BUTTON_PADY)
 
-        # ----------- KNOP: SCHADE MELDINGEN -----------
+        # ==== schadeoverzicht ====
         damage_btn = ctk.CTkButton(
             main_frame,
-            text="Schade meldingen",
+            text="Schadeoverzicht",
             width=BTN_WIDTH,
             height=BTN_HEIGHT,
             font=ctk.CTkFont(size=16, weight="bold"),
@@ -123,10 +119,10 @@ class ManagerPortalPage(ctk.CTkFrame):
         )
         damage_btn.grid(row=0, column=1, padx=BUTTON_PADX, pady=BUTTON_PADY)
 
-        # ----------- KNOP: REPARATIES -----------
+        # ==== reparatieoverzicht ====
         repairs_btn = ctk.CTkButton(
             main_frame,
-            text="Reparaties",
+            text="Reparatieoverzicht",
             width=BTN_WIDTH,
             height=BTN_HEIGHT,
             font=ctk.CTkFont(size=16, weight="bold"),
@@ -167,9 +163,7 @@ class ManagerPortalPage(ctk.CTkFrame):
         )
         yes_btn.pack(side="left", padx=10)
 
-    # ===========================
-    #      FUNCTIES PER KNOP
-    # ===========================
+    # ==== knopfuncties (AI gemaakt) ====
 
     def open_reservations(self):
         self.app.show_page("ReservationsPage")
